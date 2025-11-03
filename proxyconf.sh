@@ -22,7 +22,19 @@ EOF
             unset LD_PRELOAD PROXYCHAINS_CONF_FILE PROXYCHAINS_QUIET_MODE PROXYCHAINS_ENDPOINT
             ;;
         1:whereami)
-            echo "$PROXYCHAINS_ENDPOINT"
+            if [[ -n "$PROXYCHAINS_ENDPOINT" ]]; then
+                echo -n "$PROXYCHAINS_ENDPOINT"
+            elif [[ "$LD_PRELOAD" == */usr/lib/libproxychains4.so* ]]; then
+                echo -n 'proxychains'
+            fi
+            declare -r netns="$(ip netns identify)"
+            if [[ -n "${netns}" ]]; then
+                if [[ -n "${value}" ]]; then
+                    echo -n "@${netns}"
+                else
+                    echo -n "${netns}"
+                fi
+            fi
             ;;
         *:exec)
             if (( $3 < 6 )); then
@@ -45,4 +57,18 @@ EOF
     esac
 }
 
-compdef "_arguments '1:first arg:(set unset whereami exec)'" proxyconf
+if [[ -n "$ZSH_VERSION" ]]; then
+    compdef "_arguments '1:first arg:(set unset whereami exec)'" proxyconf
+elif [[ -n "$BASH_VERSION" ]]; then
+    _proxyconf_complete() {
+        COMPREPLY=()
+        declare cur="${COMP_WORDS[COMP_CWORD]}"
+        declare prev="${COMP_WORDS[COMP_CWORD-1]}"
+        if (( COMP_CWORD == 1 )); then
+            COMPREPLY=($(compgen -W 'set unset whereami exec' -- "${cur}"))
+            return 0
+        fi
+    }
+
+    complete -F _proxyconf_complete proxyconf
+fi

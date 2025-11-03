@@ -1,4 +1,4 @@
-# Impacket ZSH Integration
+# Impacket Shell Integration
 
 ![Screenshot](./assets/screenshot.png)
 
@@ -6,43 +6,67 @@ A bunch of scripts to reduce friction when pentesting Active Directory from Linu
 
 # Setup
 
-Clone the repository.
+First clone the repository.
 
 ~~~ bash
-git clone --depth 1 https://github.com/dadevel/impacket-zsh-integration.git ~/.local/share/impacket-zsh-integration
+git clone --depth 1 https://github.com/dadevel/impacket-shell-integration.git ~/.local/share/impacket-shell-integration
 ~~~
 
-Append the following snippet to your `~/.zshrc`:
+Then append the following snippet to your `~/.bashrc` or `~/.zshrc`:
 
 ~~~ bash
-source ~/.local/share/impacket-zsh-integration/krbconf.zsh
-source ~/.local/share/impacket-zsh-integration/proxyconf.zsh
+source ~/.local/share/impacket-shell-integration/krbconf.sh
+source ~/.local/share/impacket-shell-integration/proxyconf.sh
 ~~~
 
-Find your [Powerlevel10k](https://github.com/romkatv/powerlevel10k) config and modify it to look something like this:
+If you are using Bash with [ble.sh](https://github.com/akinomyoga/ble.sh) you get additional prompt elements.
+Your `~/.bashrc` should look like this:
+
+~~~ bash
+source ~/.local/share/impacket-shell-integration/krbconf.sh
+source ~/.local/share/impacket-shell-integration/proxyconf.sh
+source ~/.local/share/impacket-shell-integration/ble.bash
+source ~/.local/share/blesh/ble.sh --attach=none
+...
+# left prompt
+PS1='\q{krbconf}$ '
+# right prompt
+bleopt prompt_rps1='\q{proxyconf}\q{tunnel}'
+...
+[[ ! "${BLE_VERSION-}" ]] || ble-attach
+~~~
+
+If you are using ZSH with [Powerlevel10k](https://github.com/romkatv/powerlevel10k) you get additional prompt elements as well.
+Your `powerlevel10k.zsh` should look like this:
 
 ~~~ bash
 ...
 () {
     ...
-    typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+    typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
         ...
         krbconf
+        ...
+    )
+    typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+        ...
         proxyconf
+        tunnel
+        ...
     )
 
-    source ~/.local/share/impacket-zsh-integration/powerlevel10k.zsh
+    source ~/.local/share/impacket-shell-integration/powerlevel10k.zsh
     ...
 }()
 ...
 ~~~
 
-Configure your terminal to use [Nerd Fonts](https://www.nerdfonts.com/) or change the icons in [powerlevel10k.zsh](./powerlevel10k.zsh).
+The prompts rely on icons from [Nerd Fonts](https://www.nerdfonts.com/).
 
 # Usage
 
 Configure a SOCKS proxy in the current shell with the help of [proxychains-ng](https://github.com/rofl0r/proxychains-ng).
-The network traffic of following commands will be tunneled over the proxy.
+The network traffic of all following commands will be tunneled over the proxy (as long as they link against libc).
 
 ~~~ bash
 proxyconf set socks5 127.0.0.1 1080
@@ -63,7 +87,7 @@ impacket-smbclient -k -no-pass srv01.corp.local
 ~~~
 
 If you additionally specify the hostname or FQDN of a domain controller with `-K` / `--kdc`, a suitable `$KRB5_CONFIG` is configured in the environment as well (thanks [@mpgn](https://twitter.com/mpgn_x64/status/1881252755131760659) for the idea).
-This is required for certain tools like [evil-winrm](https://github.com/Hackplayers/evil-winrm).
+This is required for some tools that use GSSAPI like [evil-winrm](https://github.com/Hackplayers/evil-winrm).
 
 ~~~ bash
 krbconf set ./jdoeadm.ccache -K dc01

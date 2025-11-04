@@ -76,7 +76,7 @@ ${custom.proxyconf}\
 $line_break${custom.krbconf}$character"""
 
 [custom.krbconf]
-command = '''bash -c '[ -n "$KRB5CCNAME" ] && [ -f "$KRB5CCNAME" ] && (klist -c "$KRB5CCNAME" 2>/dev/null | grep "Default principal:" | cut -d: -f2 |tr "[:upper:]" '[:lower:]'| xargs || echo "${KRB5CCNAME_DOMAIN,,}")' '''
+command = '''bash -c 'echo "${KRB5CCNAME_USER}@${KRB5CCNAME_DOMAIN}"' '''
 when = '[ -n "$KRB5CCNAME" ]'
 # Select a icon and replace 'Place_a_icon_here'  https://www.nerdfonts.com/cheat-sheet
 symbol = "Place_a_icon_here "
@@ -84,7 +84,7 @@ style = "color_green"
 format = "[$symbol$output]($style)"
 
 [custom.proxyconf]
-command = '''bash -c '[ -n "$PROXYCHAINS_ENDPOINT" ] && echo "${PROXYCHAINS_ENDPOINT}"' '''
+command = '''bash -c 'echo "${PROXYCHAINS_ENDPOINT}"' '''
 when = '[ -n "$PROXYCHAINS_ENDPOINT" ]'
 # Select a icon and replace 'Place_a_icon_here'  https://www.nerdfonts.com/cheat-sheet
 symbol = "Place_a_icon_here "

@@ -63,6 +63,36 @@ Your `powerlevel10k.zsh` should look like this:
 
 The prompts rely on icons from [Nerd Fonts](https://www.nerdfonts.com/).
 
+If you are using Bash with [Starship](https://starship.rs/) you get additional prompt elements as well.
+Your `starship.toml` should look like this:
+
+~~~toml
+# Example for https://starship.rs/presets/gruvbox-rainbow
+
+format = """
+...
+${custom.proxyconf}\
+...
+$line_break${custom.krbconf}$character"""
+
+[custom.krbconf]
+command = '''bash -c '[ -n "$KRB5CCNAME" ] && [ -f "$KRB5CCNAME" ] && (klist -c "$KRB5CCNAME" 2>/dev/null | grep "Default principal:" | cut -d: -f2 |tr "[:upper:]" '[:lower:]'| xargs || echo "${KRB5CCNAME_DOMAIN,,}")' '''
+when = '[ -n "$KRB5CCNAME" ]'
+# Select a icon and replace 'Place_a_icon_here'  https://www.nerdfonts.com/cheat-sheet
+symbol = "Place_a_icon_here "
+style = "color_green"
+format = "[$symbol$output]($style)"
+
+[custom.proxyconf]
+command = '''bash -c '[ -n "$PROXYCHAINS_ENDPOINT" ] && echo "${PROXYCHAINS_ENDPOINT}"' '''
+when = '[ -n "$PROXYCHAINS_ENDPOINT" ]'
+# Select a icon and replace 'Place_a_icon_here'  https://www.nerdfonts.com/cheat-sheet
+symbol = "Place_a_icon_here "
+style = "fg:color_fg0 bg:color_green"
+format = "[ $symbol$output ]($style)"
+
+~~~
+
 # Usage
 
 Configure a SOCKS proxy in the current shell with the help of [proxychains-ng](https://github.com/rofl0r/proxychains-ng).

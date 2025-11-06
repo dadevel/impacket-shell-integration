@@ -63,6 +63,27 @@ Your `powerlevel10k.zsh` should look like this:
 
 The prompts rely on icons from [Nerd Fonts](https://www.nerdfonts.com/).
 
+If you are using any shell supported by [Starship](https://starship.rs/) you get additional prompt elements as well.
+Your `starship.toml` should look like this:
+
+~~~ toml
+right_format = "${custom.krbconf}${custom.proxyconf}"
+
+[custom.krbconf]
+command = '[ -n "$KRB5CCNAME_HOST" ] && echo "$KRB5CCNAME_DOMAIN/$KRB5CCNAME_USER@$KRB5CCNAME_HOST" || echo "$KRB5CCNAME_DOMAIN/$KRB5CCNAME_USER"'
+when = '[ -n "$KRB5CCNAME" ] && [ -n "$KRB5CCNAME_DOMAIN" ] && [ -n "$KRB5CCNAME_USER" ]'
+symbol = ""
+style = "fg:blue"
+format = '[$symbol $output]($style) '
+
+[custom.proxyconf]
+command = 'echo "$PROXYCHAINS_ENDPOINT"'
+when = '[ -n "$PROXYCHAINS_ENDPOINT" ] && [ "$LD_PRELOAD" = /usr/lib/libproxychains4.so ]'
+symbol = "󰁕"
+style = "fg:green"
+format = '[$symbol $output]($style) '
+~~~
+
 # Usage
 
 Configure a SOCKS proxy in the current shell with the help of [proxychains-ng](https://github.com/rofl0r/proxychains-ng).

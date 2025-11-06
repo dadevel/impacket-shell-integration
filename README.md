@@ -63,34 +63,25 @@ Your `powerlevel10k.zsh` should look like this:
 
 The prompts rely on icons from [Nerd Fonts](https://www.nerdfonts.com/).
 
-If you are using Bash with [Starship](https://starship.rs/) you get additional prompt elements as well.
+If you are using any shell supported by [Starship](https://starship.rs/) you get additional prompt elements as well.
 Your `starship.toml` should look like this:
 
-~~~toml
-# Example for https://starship.rs/presets/gruvbox-rainbow
-
-format = """
-...
-${custom.proxyconf}\
-...
-$line_break${custom.krbconf}$character"""
+~~~ toml
+right_format = "${custom.krbconf}${custom.proxyconf}"
 
 [custom.krbconf]
-command = '''bash -c 'echo "${KRB5CCNAME_USER}@${KRB5CCNAME_DOMAIN}"' '''
-when = '[ -n "$KRB5CCNAME" ]'
-# Select a icon and replace 'Place_a_icon_here'  https://www.nerdfonts.com/cheat-sheet
-symbol = "Place_a_icon_here "
-style = "color_green"
-format = "[$symbol$output]($style)"
+command = '[ -n "$KRB5CCNAME_HOST" ] && echo "$KRB5CCNAME_DOMAIN/$KRB5CCNAME_USER@$KRB5CCNAME_HOST" || echo "$KRB5CCNAME_DOMAIN/$KRB5CCNAME_USER"'
+when = '[ -n "$KRB5CCNAME" ] && [ -n "$KRB5CCNAME_DOMAIN" ] && [ -n "$KRB5CCNAME_USER" ]'
+symbol = ""
+style = "fg:blue"
+format = '[$symbol $output]($style) '
 
 [custom.proxyconf]
-command = '''bash -c 'echo "${PROXYCHAINS_ENDPOINT}"' '''
-when = '[ -n "$PROXYCHAINS_ENDPOINT" ]'
-# Select a icon and replace 'Place_a_icon_here'  https://www.nerdfonts.com/cheat-sheet
-symbol = "Place_a_icon_here "
-style = "fg:color_fg0 bg:color_green"
-format = "[ $symbol$output ]($style)"
-
+command = 'echo "$PROXYCHAINS_ENDPOINT"'
+when = '[ -n "$PROXYCHAINS_ENDPOINT" ] && [ "$LD_PRELOAD" = /usr/lib/libproxychains4.so ]'
+symbol = "󰁕"
+style = "fg:green"
+format = '[$symbol $output]($style) '
 ~~~
 
 # Usage

@@ -12,44 +12,81 @@ First clone the repository.
 git clone --depth 1 https://github.com/dadevel/impacket-shell-integration.git ~/.local/share/impacket-shell-integration
 ~~~
 
-Then append the following snippet to your `~/.bashrc` or `~/.zshrc`:
+Then append the following snippet to your `~/.bashrc` or `~/.zshrc` in order to use `krbconf` and `proxyconf`.
+Jump to [Usage](#Usage) to see what these commands can do.
 
 ~~~ bash
 source ~/.local/share/impacket-shell-integration/krbconf.sh
 source ~/.local/share/impacket-shell-integration/proxyconf.sh
 ~~~
 
-If you are using Bash with [ble.sh](https://github.com/akinomyoga/ble.sh) you get additional prompt elements.
+## Bash Integration
+
+If you are using regular Bash you can add additional prompt elements as well.
 Your `~/.bashrc` should look like this:
 
 ~~~ bash
+...
 source ~/.local/share/impacket-shell-integration/krbconf.sh
 source ~/.local/share/impacket-shell-integration/proxyconf.sh
-source ~/.local/share/impacket-shell-integration/ble.bash
+source ~/.local/share/impacket-shell-integration/bash.sh
+
+_prompt() {
+    ...
+    declare -r left_delimiter=''
+    declare -r right_delimiter='  '
+    declare -a elements=("$(_prompt_krbconf)" "$(_prompt_proxyconf)" "$(_prompt_tunnel)")
+    declare element
+    for element in "${elements[@]}"; do
+        if [[ -n "${element}" ]]; then
+            PS1+="${left_delimiter}"
+            PS1+="${element}"
+            PS1+="${right_delimiter}"
+        fi
+    done
+    ...
+}
+
+PROMPT_COMMAND=_prompt
+...
+~~~
+
+## Ble.sh Integration
+
+If you are using Bash with [ble.sh](https://github.com/akinomyoga/ble.sh) you can add additional elements to your prompt.
+Your `~/.bashrc` should look like this:
+
+~~~ bash
+...
+source ~/.local/share/impacket-shell-integration/krbconf.sh
+source ~/.local/share/impacket-shell-integration/proxyconf.sh
+source ~/.local/share/impacket-shell-integration/ble.sh
 source ~/.local/share/blesh/ble.sh --attach=none
 ...
 # left prompt
-PS1='\q{krbconf}$ '
+PS1='...'
 # right prompt
-bleopt prompt_rps1='\q{proxyconf}\q{tunnel}'
+bleopt prompt_rps1='\q{krbconf}\q{proxyconf}\q{tunnel}'
 ...
 [[ ! "${BLE_VERSION-}" ]] || ble-attach
+...
 ~~~
 
-If you are using ZSH with [Powerlevel10k](https://github.com/romkatv/powerlevel10k) you get additional prompt elements as well.
+## Zsh Integration
+
+If you are using Zsh with [Powerlevel10k](https://github.com/romkatv/powerlevel10k) you can get additional prompt elements too.
 Your `powerlevel10k.zsh` should look like this:
 
 ~~~ bash
 ...
+source ~/.local/share/impacket-shell-integration/krbconf.sh
+source ~/.local/share/impacket-shell-integration/proxyconf.sh
+...
 () {
     ...
-    typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
-        ...
-        krbconf
-        ...
-    )
     typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
         ...
+        krbconf
         proxyconf
         tunnel
         ...
@@ -63,7 +100,9 @@ Your `powerlevel10k.zsh` should look like this:
 
 The prompts rely on icons from [Nerd Fonts](https://www.nerdfonts.com/).
 
-If you are using any shell supported by [Starship](https://starship.rs/) you get additional prompt elements as well.
+## Starship Integration
+
+If you are using any shell supported by [Starship](https://starship.rs/) you can also add additional prompt elements.
 Your `starship.toml` should look like this:
 
 ~~~ toml

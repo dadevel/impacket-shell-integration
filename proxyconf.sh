@@ -1,6 +1,7 @@
 proxyconf() {
     case "$#:$1" in
         4:set)
+            proxyconf unset
             declare -r protocol="$2"
             declare -r host="$3"
             declare -r port="$4"
@@ -37,12 +38,16 @@ EOF
             fi
             ;;
         *:exec)
-            if (( $3 < 6 )); then
+            if (( $# < 5 )); then
                 echo 'bad arguments' >&2
                 return 1
             fi
-            proxyconf set "$2" "$3" "$4"
-            "${@:5}"
+            (
+                proxyconf unset
+                trap 'proxyconf unset' EXIT
+                proxyconf set "$2" "$3" "$4"
+                "${@:5}"
+            )
             ;;
         *)
             echo 'bad arguments' >&2
@@ -51,7 +56,7 @@ EOF
             echo '  set http|socks4|socks5 HOST PORT' >&2
             echo '  unset' >&2
             echo '  whereami' >&2
-            echo '  exec http|socks4|socks5 HOST PORT CMDLINE...' >&2
+            echo '  exec http|socks4|socks5 HOST PORT COMMAND...' >&2
             return 1
             ;;
     esac

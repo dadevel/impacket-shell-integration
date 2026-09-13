@@ -133,6 +133,12 @@ proxyconf set socks5 127.0.0.1 1080
 nc -vz dc01.corp.local 445
 ~~~
 
+Execute a one-off command over a proxy without changing the current shell.
+
+~~~ bash
+proxyconf exec socks5 127.0.0.1 1080 nc -vz dc01.corp.local 445
+~~~
+
 Stop tunneling traffic over the proxy.
 
 ~~~ bash
